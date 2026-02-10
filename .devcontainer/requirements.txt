@@ -40,3 +40,4 @@ pytest==7.4.4
 # Code Quality
 black==24.1.1
 pylint==3.0.3
+pyarrow==15.0.0

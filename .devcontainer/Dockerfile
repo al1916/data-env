@@ -1,11 +1,10 @@
 FROM python:3.11-bookworm
 
-# Variables d'environnement
 ENV PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive \
     PIP_NO_CACHE_DIR=1
 
-# Installation des outils système essentiels
+# Installation des outils systeme
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
@@ -14,30 +13,34 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nano \
     build-essential \
     postgresql-client \
+    sudo \
     && rm -rf /var/lib/apt/lists/*
 
-# Créer un utilisateur non-root
+# Creer utilisateur vscode
 ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    && apt-get update \
-    && apt-get install -y sudo \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Passer à l'utilisateur
-USER $USERNAME
+# Copier requirements en tant que root
+COPY requirements.txt /tmp/requirements.txt
 
-# Copier et installer les requirements Python
-COPY requirements.txt /tmp/pip-tmp/
+# Installer les packages Python en tant que root
 RUN pip install --upgrade pip && \
-    pip install -r /tmp/pip-tmp/requirements.txt && \
-    rm -rf /tmp/pip-tmp
+    pip install -r /tmp/requirements.txt
 
-# Définir le répertoire de travail
+# Nettoyer (en tant que root, pas de probleme de permission)
+RUN rm -f /tmp/requirements.txt
+
+# Creer le repertoire workspace
+RUN mkdir -p /workspace && chown -R $USERNAME:$USERNAME /workspace
+
+# Passer a l'utilisateur vscode
+USER $USERNAME
 WORKDIR /workspace
 
 CMD [ "sleep", "infinity" ]
