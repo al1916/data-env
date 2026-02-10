@@ -1,0 +1,31 @@
+{
+  "name": "Data Engineering Environment",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python3",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "black",
+        "editor.formatOnSave": true,
+        "terminal.integrated.defaultProfile.linux": "bash"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "ms-toolsai.jupyter",
+        "eamodio.gitlens"
+      ]
+    }
+  },
+  
+  "forwardPorts": [8888],
+  "postCreateCommand": "pip list",
+  "remoteUser": "vscode"
+}
